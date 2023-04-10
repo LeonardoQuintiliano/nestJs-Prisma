@@ -1,7 +1,7 @@
 export type BookDTO = {
-    id? : String,
-    name: String,
-    description: String,
-    author: String,
-    bar_code: String
+    id? : string,
+    name: string,
+    description: string,
+    author: string,
+    bar_code: string
 }
