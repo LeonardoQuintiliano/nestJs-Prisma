@@ -28,4 +28,23 @@ export class BookService {
     async findAll(){
         return this.prisma.book.findMany();
     }
+
+    async update(id: string, data: BookDTO){
+        const bookExists = await this.prisma.book.findUnique({
+            where: {
+                id,
+            },
+        });
+
+        if (!bookExists){
+            throw new Error("Book doesn't exists");
+        }
+
+        return await this.prisma.book.update({
+            data,
+            where: {
+                id,
+            },
+        });
+    }
 }
