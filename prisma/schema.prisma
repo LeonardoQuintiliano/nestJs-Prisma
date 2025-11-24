@@ -10,12 +10,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  books     Book[]   @relation("UserBooks")   // relação implícita: User.books (um) -> Book.owner (muitos)
+
+  @@map("users") // opcional: mapeia a tabela para "users" no DB
+}
+
 model Book {
-  id String @id @default(uuid())
-  name String
+  id         String   @id @default(uuid())
+  name       String
   description String
-  author String
-  bar_code String @unique
+  author     String
+  bar_code   String   @unique
+  ownerId    String?  // coluna FK no DB
+  owner      User?    @relation("UserBooks", fields: [ownerId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("books")
 }
