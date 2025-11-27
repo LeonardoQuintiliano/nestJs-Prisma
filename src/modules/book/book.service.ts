@@ -1,43 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { BookDTO } from './dto/book.dto';
 import { PrismaService } from 'src/database/PrismaService';
+import { CreateBookDto } from './dto/createBook.dto';
+import { Prisma } from '@prisma/client';
+import { IBookService } from './interfaces/book.service.interface';
 
 @Injectable()
-export class BookService {
-    constructor(private prisma: PrismaService){
-
-    }
-    async create(data: BookDTO) {
-       const bookExists = await this.prisma.book.findFirst({
-        where: {
-            bar_code: data.bar_code,
-        },
-       });
-
-       if(bookExists){
-        throw new Error("Book already exists");
-       }
-       
+export class BookService implements IBookService {
+    constructor(private prisma: PrismaService){}
+    async create(data: CreateBookDto): Promise<BookDTO> {
+       try {
         const book = await this.prisma.book.create({
-        data,
-       });
-
+            data
+        });
         return book;
+       } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+            throw new ConflictException('Book with this bar_code already exists');
+        }
+        throw error;
+       }
     }
 
-    async findAll(){
-        return this.prisma.book.findMany();
+    async findAll(): Promise<BookDTO[]>{
+        return this.prisma.book.findMany({
+            orderBy: { createdAt: 'desc' }
+        });
     }
 
-    async update(id: string, data: BookDTO){
-        const bookExists = await this.prisma.book.findUnique({
+    async findOne(id: string): Promise<BookDTO>{
+        const book: BookDTO = await this.prisma.book.findUnique({
             where: {
                 id,
             },
         });
 
-        if (!bookExists){
-            throw new Error("Book doesn't exists");
+        return book;
+    }
+
+    async update(id: string, data: CreateBookDto){
+        const bookExists = await this.findOne(id);
+
+        if (!bookExists) {
+            throw new NotFoundException('Book does not exist');
         }
 
         return await this.prisma.book.update({
@@ -46,5 +51,18 @@ export class BookService {
                 id,
             },
         });
+    }
+
+    async delete(id: string): Promise<string>{
+        const existing = await this.prisma.book.findUnique({ where: { id } });
+        if (!existing) throw new NotFoundException('Book not found');
+        
+        await this.prisma.book.delete({
+            where: {
+                id
+            },
+        });
+
+        return `Book with Id ${id} deleted successfully`;
     }
 }
