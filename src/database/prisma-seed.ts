@@ -17,33 +17,27 @@ async function main() {
         },
     });
 
-    await prisma.book.createMany({
-        data: [
-            {
-            name: 'Clean Code',
-            description: 'A Handbook of Agile Software Craftsmanship',
-            author: 'Robert C. Martin',
-            bar_code: '9780132350884',
-        },
-        {
-            name: 'Refactoring',
-            description: 'Improving the Design of Existing Code',
-            author: 'Martin Fowler',
-            bar_code: '9780201485677',
-        },
-    ],
-    skipDuplicates: true,
+    await prisma.book.upsert({
+      where: { bar_code: '9780201485677' },
+      update: {},
+      create: {
+        name: 'Refactoring',
+        description: 'Improving the Design of Existing Code',
+        author: 'Martin Fowler',
+        bar_code: '9780201485677',
+      },
     });
 
-    await prisma.book.update({
-        where: { id: 'b1' },
-        data: {
-            owner: {
-                connect: {
-                    id: user.id
-                }
-            }
-        },
+    await prisma.book.upsert({
+      where: { bar_code: '9780132350884' },
+      update: {},
+      create: {
+        name: 'Clean Code',
+        description: 'A Handbook of Agile Software Craftsmanship',
+        author: 'Robert C. Martin',
+        bar_code: '9780132350884',
+        owner: { connect: { id: user.id } }, // conecta direto
+      },
     });
 
     console.log("Seed finalizada");
