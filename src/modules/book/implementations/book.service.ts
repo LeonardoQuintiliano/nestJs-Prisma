@@ -1,9 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { BookDTO } from './dto/book.dto';
+import { BookDTO } from '../dto/book.dto';
 import { PrismaService } from 'src/database/PrismaService';
-import { CreateBookDto } from './dto/createBook.dto';
+import { CreateBookDto } from '../dto/createBook.dto';
 import { Prisma } from '@prisma/client';
-import { IBookService } from './interfaces/book.service.interface';
+import { IBookService } from '../interfaces/book.service.interface';
 
 @Injectable()
 export class BookService implements IBookService {

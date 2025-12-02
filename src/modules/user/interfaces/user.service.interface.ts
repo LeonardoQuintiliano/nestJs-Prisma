@@ -1,0 +1,10 @@
+import { CreateUserDto } from "../dto/createUser.dto";
+import { UserDto } from "../dto/user.dto";
+
+export interface IUserService {
+    create(data: CreateUserDto): Promise<UserDto>;
+    findAll(): Promise<UserDto[]>;
+    findOne(id: string): Promise<UserDto>;
+    update(id: string, data: CreateUserDto);
+    delete(id: string): Promise<string>;
+}

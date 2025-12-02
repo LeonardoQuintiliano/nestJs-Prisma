@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { BookService } from './book.service';
-import { BookController } from './book.controller';
+import { BookService } from './implementations/book.service';
+import { BookController } from './implementations/book.controller';
 import { PrismaModule } from 'src/database/prisma.module';
 
 @Module({
