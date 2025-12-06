@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateUserDto } from "../dto/createUser.dto";
 import { UserDto } from "../dto/user.dto";
 import { IUserService } from "../interfaces/user.service.interface";
@@ -51,14 +51,63 @@ export class UserService implements IUserService {
     }
 
     async findOne(id: string): Promise<UserDto> {
-        throw new Error("Method not implemented.");
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id
+                },
+            });
+
+            if(!user) {
+                throw new NotFoundException("User does not exist")
+            }
+            
+            return this.mapUserToDto(user);
+        } catch (error) {
+            throw new Error(error);
+        }
     }
 
     async update(id: string, data: CreateUserDto) {
-        throw new Error("Method not implemented.");
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id
+                },
+            });
+
+            if (!user) {
+                throw new NotFoundException('User does not exist');
+            }
+
+            return await this.prisma.user.update({
+                data,
+                where: {
+                    id
+                },
+            });
+        } catch (error) {
+            throw new Error(error);
+        }
     }
 
     async delete(id: string): Promise<string> {
-        throw new Error("Method not implemented.");
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id
+            },
+        });
+
+        if(!user) {
+            throw new NotFoundException("User not found");
+        }
+
+        await this.prisma.user.delete({
+            where: {
+                id
+            },
+        });
+
+        return `User with Id ${id} deleted successfully`;
     }
 }
