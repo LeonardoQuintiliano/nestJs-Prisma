@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { BookDTO } from '../dto/book.dto';
 import { PrismaService } from 'src/database/PrismaService';
-import { CreateBookDto } from '../dto/createBook.dto';
+import { CreateBookDto, UpdateBookDto } from '../dto/createBook.dto';
 import { Prisma } from '@prisma/client';
 import { IBookService } from '../interfaces/book.service.interface';
 
@@ -38,7 +38,7 @@ export class BookService implements IBookService {
         return book;
     }
 
-    async update(id: string, data: CreateBookDto){
+    async update(id: string, data: UpdateBookDto){
         const bookExists = await this.findOne(id);
 
         if (!bookExists) {

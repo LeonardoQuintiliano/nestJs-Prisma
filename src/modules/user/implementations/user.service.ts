@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateUserDto } from "../dto/createUser.dto";
+import { CreateUserDto, UpdateUserDto } from "../dto/createUser.dto";
 import { UserDto } from "../dto/user.dto";
 import { IUserService } from "../interfaces/user.service.interface";
 import { PrismaService } from "src/database/PrismaService";
@@ -56,6 +56,7 @@ export class UserService implements IUserService {
                 where: {
                     id
                 },
+                include: { books: true },
             });
 
             if(!user) {
@@ -68,7 +69,7 @@ export class UserService implements IUserService {
         }
     }
 
-    async update(id: string, data: CreateUserDto) {
+    async update(id: string, data: UpdateUserDto) {
         try {
             const user = await this.prisma.user.findUnique({
                 where: {
