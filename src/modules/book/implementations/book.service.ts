@@ -38,7 +38,7 @@ export class BookService implements IBookService {
         return book;
     }
 
-    async update(id: string, data: UpdateBookDto){
+    async update(id: string, data: UpdateBookDto): Promise<BookDTO>{
         const bookExists = await this.findOne(id);
 
         if (!bookExists) {

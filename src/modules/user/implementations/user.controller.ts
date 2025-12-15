@@ -24,7 +24,7 @@ export class UserController implements IUserController {
     }
 
     @Put(':id')
-    async update(@Param('id') id: string, @Body() data: CreateUserDto) {
+    async update(@Param('id') id: string, @Body() data: CreateUserDto): Promise<UserDto> {
         return this.userService.update(id, data);
     }
 

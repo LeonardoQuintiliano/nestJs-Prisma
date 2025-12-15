@@ -5,6 +5,6 @@ export interface IUserService {
     create(data: CreateUserDto): Promise<UserDto>;
     findAll(): Promise<UserDto[]>;
     findOne(id: string): Promise<UserDto>;
-    update(id: string, data: CreateUserDto);
+    update(id: string, data: CreateUserDto): Promise<UserDto>;
     delete(id: string): Promise<string>;
 }

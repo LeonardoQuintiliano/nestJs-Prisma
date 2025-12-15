@@ -5,6 +5,6 @@ export interface IBookController {
     create(data: CreateBookDto): Promise<BookDTO>;
     findAll(): Promise<BookDTO[]>;
     findOne(id: string): Promise<BookDTO>;
-    update(id: string, data: CreateBookDto);
+    update(id: string, data: CreateBookDto): Promise<BookDTO>;
     delete(id: string): Promise<string>;
 }

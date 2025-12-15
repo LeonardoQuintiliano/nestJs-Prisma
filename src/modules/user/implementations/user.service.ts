@@ -69,7 +69,7 @@ export class UserService implements IUserService {
         }
     }
 
-    async update(id: string, data: UpdateUserDto) {
+    async update(id: string, data: UpdateUserDto): Promise<UserDto> {
         try {
             const user = await this.prisma.user.findUnique({
                 where: {
@@ -81,12 +81,14 @@ export class UserService implements IUserService {
                 throw new NotFoundException('User does not exist');
             }
 
-            return await this.prisma.user.update({
+            const updatedUser = await this.prisma.user.update({
                 data,
                 where: {
                     id
                 },
             });
+
+            return this.mapUserToDto(updatedUser);
         } catch (error) {
             throw new Error(error);
         }
