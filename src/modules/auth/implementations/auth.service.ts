@@ -3,9 +3,12 @@ import { LoginInput, LoginOutput } from "../dto/login.dto";
 import { IAuthService } from "../interfaces/auth.service.interface";
 import { UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from 'bcrypt';
+import { JwtService } from "@nestjs/jwt";
 
 export class AuthService implements IAuthService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService,
+        private readonly jwtService: JwtService,
+    ) {}
     async login(data: LoginInput): Promise<LoginOutput> {
         try {
             const user = await this.prisma.user.findUnique({
@@ -24,8 +27,16 @@ export class AuthService implements IAuthService {
                 throw new UnauthorizedException("Invalid password");
             }
 
+            const payload = {
+                sub: user.id,
+                email: user.email,
+                role: user.role,
+            };
+
+            const accessToken = this.jwtService.sign(payload);
+
             return {
-            access_token: 'fake-token-for-now',
+            access_token: accessToken,
             expires_in: 3600,
             };
         } catch (error) {
