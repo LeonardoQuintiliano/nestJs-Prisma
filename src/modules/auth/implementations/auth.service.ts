@@ -1,10 +1,11 @@
 import { PrismaService } from "src/database/PrismaService";
 import { LoginInput, LoginOutput } from "../dto/login.dto";
 import { IAuthService } from "../interfaces/auth.service.interface";
-import { UnauthorizedException } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
 
+@Injectable()
 export class AuthService implements IAuthService {
     constructor(private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
