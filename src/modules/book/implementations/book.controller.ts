@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { BookService } from './book.service';
 import { BookDTO } from '../dto/book.dto';
-import { CreateBookDto } from '../dto/createBook.dto';
+import { CreateBookDto, UpdateBookDto } from '../dto/createBook.dto';
 import { IBookController } from '../interfaces/book.controller.interface';
 import { JwtAuthGuard } from 'src/modules/auth/jwt/jwt-auth.guard';
+import { CurrentUser } from 'src/modules/auth/decorators/current-user.decorator';
 
 @Controller('books')
 export class BookController implements IBookController {
@@ -11,8 +12,8 @@ export class BookController implements IBookController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() data: CreateBookDto): Promise<BookDTO>{
-    return this.bookService.create(data);
+  async create(@Body() data: CreateBookDto, @CurrentUser() user): Promise<BookDTO>{
+    return this.bookService.create(data, user.sub);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -29,8 +30,8 @@ export class BookController implements IBookController {
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: CreateBookDto): Promise<BookDTO>{
-    return this.bookService.update(id, data);
+  async update(@Param('id') id: string, @Body() data: UpdateBookDto, @CurrentUser() user): Promise<BookDTO>{
+    return this.bookService.update(id, data, user.sub);
   }
 
   @UseGuards(JwtAuthGuard)

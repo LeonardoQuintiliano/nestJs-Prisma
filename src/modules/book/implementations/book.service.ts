@@ -8,10 +8,13 @@ import { IBookService } from '../interfaces/book.service.interface';
 @Injectable()
 export class BookService implements IBookService {
     constructor(private prisma: PrismaService){}
-    async create(data: CreateBookDto): Promise<BookDTO> {
+    async create(data: CreateBookDto, userId: string): Promise<BookDTO> {
        try {
         const book = await this.prisma.book.create({
-            data
+            data: {
+                ...data,
+                ownerId: userId
+            }
         });
         return book;
        } catch (error) {
@@ -38,7 +41,7 @@ export class BookService implements IBookService {
         return book;
     }
 
-    async update(id: string, data: UpdateBookDto): Promise<BookDTO>{
+    async update(id: string, data: UpdateBookDto, userId: string): Promise<BookDTO>{
         const bookExists = await this.findOne(id);
 
         if (!bookExists) {
