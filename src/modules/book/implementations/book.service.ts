@@ -1,9 +1,10 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { BookDTO } from '../dto/book.dto';
 import { PrismaService } from 'src/database/PrismaService';
 import { CreateBookDto, UpdateBookDto } from '../dto/createBook.dto';
 import { Prisma } from '@prisma/client';
 import { IBookService } from '../interfaces/book.service.interface';
+import { AuthUser } from 'src/modules/auth/dto/auth.dto';
 
 @Injectable()
 export class BookService implements IBookService {
@@ -38,22 +39,30 @@ export class BookService implements IBookService {
             },
         });
 
+        if (!book) {
+            throw new NotFoundException("Book does not exist");
+        }
+
         return book;
     }
 
-    async update(id: string, data: UpdateBookDto, userId: string): Promise<BookDTO>{
-        const bookExists = await this.findOne(id);
+    async update(id: string, data: UpdateBookDto, user: AuthUser): Promise<BookDTO>{
+        const book = await this.findOne(id);
 
-        if (!bookExists) {
+        if (!book) {
             throw new NotFoundException('Book does not exist');
         }
 
-        return await this.prisma.book.update({
-            data,
-            where: {
-                id,
-            },
-        });
+        if (user.role == "admin" || book.ownerId == user.sub){
+            return await this.prisma.book.update({
+                data,
+                where: {
+                    id,
+                },
+            });
+        } else {
+            throw new ForbiddenException("You are not allowed to update this book");
+        }
     }
 
     async delete(id: string): Promise<string>{

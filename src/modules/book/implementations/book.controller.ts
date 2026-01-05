@@ -31,7 +31,7 @@ export class BookController implements IBookController {
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(@Param('id') id: string, @Body() data: UpdateBookDto, @CurrentUser() user): Promise<BookDTO>{
-    return this.bookService.update(id, data, user.sub);
+    return this.bookService.update(id, data, user);
   }
 
   @UseGuards(JwtAuthGuard)
