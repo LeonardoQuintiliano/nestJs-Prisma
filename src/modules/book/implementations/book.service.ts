@@ -32,7 +32,7 @@ export class BookService implements IBookService {
         });
     }
 
-    async findOne(id: string): Promise<BookDTO>{
+    async findOne(id: string, user: AuthUser): Promise<BookDTO>{
         const book: BookDTO = await this.prisma.book.findUnique({
             where: {
                 id,
@@ -43,11 +43,15 @@ export class BookService implements IBookService {
             throw new NotFoundException("Book does not exist");
         }
 
-        return book;
+        if (user.role == "admin" || book.ownerId == user.sub) {
+            return book;
+        } else {
+            throw new ForbiddenException("You are not allowed to consult this book");
+        }  
     }
 
     async update(id: string, data: UpdateBookDto, user: AuthUser): Promise<BookDTO>{
-        const book = await this.findOne(id);
+        const book = await this.findOne(id, user);
 
         if (!book) {
             throw new NotFoundException('Book does not exist');
@@ -65,16 +69,20 @@ export class BookService implements IBookService {
         }
     }
 
-    async delete(id: string): Promise<string>{
-        const existing = await this.prisma.book.findUnique({ where: { id } });
-        if (!existing) throw new NotFoundException('Book not found');
-        
-        await this.prisma.book.delete({
-            where: {
-                id
-            },
-        });
+    async delete(id: string, user: AuthUser): Promise<string>{
+        const book = await this.prisma.book.findUnique({ where: { id } });
+        if (!book) throw new NotFoundException('Book not found');
 
-        return `Book with Id ${id} deleted successfully`;
+        if (user.role == "admin" || book.ownerId == user.sub) {
+            await this.prisma.book.delete({
+                where: {
+                    id
+                },
+            });
+
+            return `Book with Id ${id} deleted successfully`;
+        } else {
+            throw new ForbiddenException("You are not allowed to delete this book");
+        } 
     }
 }

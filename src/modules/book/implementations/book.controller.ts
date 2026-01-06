@@ -24,8 +24,8 @@ export class BookController implements IBookController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<BookDTO>{
-    return this.bookService.findOne(id);
+  async findOne(@Param('id') id: string, @CurrentUser() user): Promise<BookDTO>{
+    return this.bookService.findOne(id, user);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -36,7 +36,7 @@ export class BookController implements IBookController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<string>{
-    return this.bookService.delete(id);
+  async delete(@Param('id') id: string, @CurrentUser() user): Promise<string>{
+    return this.bookService.delete(id, user);
   }
 }

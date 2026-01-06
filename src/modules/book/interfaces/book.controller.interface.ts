@@ -5,7 +5,7 @@ import { CreateBookDto, UpdateBookDto } from "../dto/createBook.dto";
 export interface IBookController {
     create(data: CreateBookDto, userId: string): Promise<BookDTO>;
     findAll(): Promise<BookDTO[]>;
-    findOne(id: string): Promise<BookDTO>;
+    findOne(id: string, user: AuthUser): Promise<BookDTO>;
     update(id: string, data: UpdateBookDto, user: AuthUser): Promise<BookDTO>;
     delete(id: string, user: AuthUser): Promise<string>;
 }
