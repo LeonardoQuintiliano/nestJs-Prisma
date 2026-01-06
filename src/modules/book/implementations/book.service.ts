@@ -26,10 +26,21 @@ export class BookService implements IBookService {
        }
     }
 
-    async findAll(): Promise<BookDTO[]>{
-        return this.prisma.book.findMany({
-            orderBy: { createdAt: 'desc' }
-        });
+    async findAll(user: AuthUser): Promise<BookDTO[]>{
+        if (user.role == "admin"){
+            return this.prisma.book.findMany({
+                orderBy: { createdAt: 'desc' }
+            });
+        } else if (user.role == "user"){
+            return this.prisma.book.findMany({
+                where: {
+                    ownerId: user.sub
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                },
+            });
+        }
     }
 
     async findOne(id: string, user: AuthUser): Promise<BookDTO>{

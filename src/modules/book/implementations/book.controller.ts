@@ -18,8 +18,8 @@ export class BookController implements IBookController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async findAll(): Promise<BookDTO[]>{
-    return this.bookService.findAll();
+  async findAll(@CurrentUser() user): Promise<BookDTO[]>{
+    return this.bookService.findAll(user);
   }
 
   @UseGuards(JwtAuthGuard)
