@@ -27,20 +27,20 @@ export class BookService implements IBookService {
     }
 
     async findAll(user: AuthUser): Promise<BookDTO[]>{
-        if (user.role == "admin"){
+        if (user.role === "admin"){
             return this.prisma.book.findMany({
                 orderBy: { createdAt: 'desc' }
             });
-        } else if (user.role == "user"){
-            return this.prisma.book.findMany({
-                where: {
-                    ownerId: user.sub
-                },
-                orderBy: {
-                    createdAt: 'desc'
-                },
-            });
-        }
+        } 
+        
+        return this.prisma.book.findMany({
+            where: {
+                ownerId: user.sub
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+        });
     }
 
     async findOne(id: string, user: AuthUser): Promise<BookDTO>{
@@ -54,7 +54,7 @@ export class BookService implements IBookService {
             throw new NotFoundException("Book does not exist");
         }
 
-        if (user.role == "admin" || book.ownerId == user.sub) {
+        if (user.role === "admin" || book.ownerId === user.sub) {
             return book;
         } else {
             throw new ForbiddenException("You are not allowed to consult this book");
@@ -64,11 +64,7 @@ export class BookService implements IBookService {
     async update(id: string, data: UpdateBookDto, user: AuthUser): Promise<BookDTO>{
         const book = await this.findOne(id, user);
 
-        if (!book) {
-            throw new NotFoundException('Book does not exist');
-        }
-
-        if (user.role == "admin" || book.ownerId == user.sub){
+        if (user.role === "admin" || book.ownerId === user.sub){
             return await this.prisma.book.update({
                 data,
                 where: {
@@ -84,7 +80,7 @@ export class BookService implements IBookService {
         const book = await this.prisma.book.findUnique({ where: { id } });
         if (!book) throw new NotFoundException('Book not found');
 
-        if (user.role == "admin" || book.ownerId == user.sub) {
+        if (user.role === "admin" || book.ownerId === user.sub) {
             await this.prisma.book.delete({
                 where: {
                     id
