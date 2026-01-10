@@ -32,7 +32,7 @@ export class UserService implements IUserService {
     
     async create(data: CreateUserDto): Promise<UserDto> {
         try {
-            const hashedPassword = bcrypt.hash(data.password, 10);
+            const hashedPassword = await bcrypt.hash(data.password, 10);
             
             const user = await this.prisma.user.create({
                 data: {

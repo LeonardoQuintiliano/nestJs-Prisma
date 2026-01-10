@@ -44,7 +44,7 @@ export class BookService implements IBookService {
     }
 
     async findOne(id: string, user: AuthUser): Promise<BookDTO>{
-        const book: BookDTO = await this.prisma.book.findUnique({
+        const book = await this.prisma.book.findUnique({
             where: {
                 id,
             },
