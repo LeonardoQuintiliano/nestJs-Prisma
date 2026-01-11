@@ -1,7 +1,7 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { BookDTO } from '../dto/book.dto';
 import { PrismaService } from 'src/database/PrismaService';
-import { CreateBookDto, UpdateBookDto } from '../dto/createBook.dto';
+import { CreateBookDto, TransferBookOwnershipDto, UpdateBookDto } from '../dto/createBook.dto';
 import { Prisma } from '@prisma/client';
 import { IBookService } from '../interfaces/book.service.interface';
 import { AuthUser } from 'src/modules/auth/dto/auth.dto';
@@ -64,9 +64,16 @@ export class BookService implements IBookService {
     async update(id: string, data: UpdateBookDto, user: AuthUser): Promise<BookDTO>{
         const book = await this.findOne(id, user);
 
+        const updateData: Prisma.BookUpdateInput = {
+            name: data.name,
+            author: data.author,
+            description: data.description,
+            bar_code: data.bar_code,
+        };
+
         if (user.role === "admin" || book.ownerId === user.sub){
             return await this.prisma.book.update({
-                data,
+                data: updateData,
                 where: {
                     id,
                 },
@@ -91,5 +98,40 @@ export class BookService implements IBookService {
         } else {
             throw new ForbiddenException("You are not allowed to delete this book");
         } 
+    }
+
+    async transferOwnership(id: string, data: TransferBookOwnershipDto, user: AuthUser): Promise<BookDTO> {
+        if (user.role !== "admin"){
+            throw new ForbiddenException("Only admins are allowed to transfer ownership");
+        }
+
+        const book = await this.prisma.book.findUnique({
+            where: {
+                id
+            }
+        });
+
+        if (!book){
+            throw new NotFoundException("Book does not exist");
+        }
+
+        const newOwner = await this.prisma.user.findUnique({
+            where: {
+                id
+            }
+        });
+
+        if (!newOwner){
+            throw new NotFoundException("User does not exist");
+        }
+
+        return await this.prisma.book.update({
+            data: {
+                ownerId: data.newOwnerId
+            },
+            where: {
+                id
+            },
+        });
     }
 }

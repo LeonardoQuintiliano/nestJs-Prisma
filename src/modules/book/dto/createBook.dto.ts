@@ -1,5 +1,5 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { IsOptional, IsString } from "class-validator";
+import { IsString } from "class-validator";
 
 export class CreateBookDto {
     @IsString()
@@ -13,10 +13,11 @@ export class CreateBookDto {
     
     @IsString()
     bar_code: string;
-    
-    @IsOptional()
-    @IsString()
-    ownerId?: string;
 }
 
 export class UpdateBookDto extends PartialType(CreateBookDto) {}
+
+export class TransferBookOwnershipDto {
+    @IsString()
+    newOwnerId: string;
+}
