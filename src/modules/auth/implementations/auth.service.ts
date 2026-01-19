@@ -37,8 +37,8 @@ export class AuthService implements IAuthService {
             const accessToken = this.jwtService.sign(payload);
 
             return {
-            access_token: accessToken,
-            expires_in: 3600,
+                access_token: accessToken,
+                expires_in: 3600,
             };
         } catch (error) {
             throw error;
